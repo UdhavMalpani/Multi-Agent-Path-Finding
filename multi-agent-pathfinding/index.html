@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAPF Simulator — Multi-Agent Pathfinding</title>
+  <meta name="description" content="Phase 1: Priority-Based Multi-Agent Pathfinding simulation with 100 agents, A* space-time planning, and real-time conflict resolution." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ================================================================
+       SIDEBAR
+       ================================================================ -->
+  <aside id="sidebar">
+
+    <!-- Header -->
+    <div id="header">
+      <div class="header-eyebrow">Phase 1 · MAPF</div>
+      <h1>Multi-Agent<br>Pathfinding</h1>
+      <p>Priority-Based Search · Space-Time A*<br>Conflict Detection & Replanning</p>
+      <span id="status-badge" class="badge badge-idle">READY</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="section">
+      <div class="section-title">Controls</div>
+      <div class="btn-row" style="margin-bottom:8px;">
+        <button id="btn-play" class="primary" style="flex:2;">▶  Play</button>
+        <button id="btn-step" style="flex:1;" title="Advance one timestep">⏭ Step</button>
+        <button id="btn-reset" style="flex:1;">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- Speed & Agents -->
+    <div class="section">
+      <div class="section-title">Simulation</div>
+      <div class="control-row">
+
+        <div class="control-item">
+          <div class="control-label">
+            <span>Speed</span>
+            <span class="val" id="label-speed">3.0×</span>
+          </div>
+          <input type="range" id="slider-speed"
+                 min="0.5" max="15" step="0.5" value="3" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span>Agents</span>
+            <span class="val" id="label-agents">100</span>
+          </div>
+          <input type="range" id="slider-agents"
+                 min="10" max="150" step="5" value="100" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span>Obstacles</span>
+            <span class="val" id="label-obstacles">12%</span>
+          </div>
+          <input type="range" id="slider-obstacles"
+                 min="0" max="35" step="1" value="12" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span>Grid Size</span>
+            <span class="val" id="label-grid">60×60</span>
+          </div>
+          <input type="range" id="slider-grid"
+                 min="20" max="80" step="5" value="60" />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- View toggles -->
+    <div class="section">
+      <div class="section-title">View</div>
+      <div class="toggle-row">
+        <button id="btn-trails" class="active">Trails</button>
+        <button id="btn-heatmap">Heatmap</button>
+      </div>
+    </div>
+
+    <!-- Live Stats -->
+    <div class="section">
+      <div class="section-title">Live Statistics</div>
+
+      <!-- Progress -->
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Arrived</span>
+          <span id="stat-arrived-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-bar"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;" class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-label">Arrived</div>
+          <div class="stat-value green" id="stat-arrived">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Moving</div>
+          <div class="stat-value cyan" id="stat-moving">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Waiting</div>
+          <div class="stat-value amber" id="stat-waiting">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Stuck</div>
+          <div class="stat-value red" id="stat-stuck">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Timestep</div>
+          <div class="stat-value purple" id="stat-timestep">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Total</div>
+          <div class="stat-value" id="stat-total">100</div>
+        </div>
+
+        <div class="stat-card wide">
+          <div>
+            <div class="stat-label">Plans / Replans</div>
+            <div style="display:flex;gap:8px;align-items:baseline;">
+              <span class="stat-value" id="stat-plans">0</span>
+              <span style="color:var(--text-muted);font-size:12px;">/</span>
+              <span class="stat-value amber" id="stat-replans">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card wide">
+          <div>
+            <div class="stat-label">Conflicts Detected</div>
+            <div class="stat-value red" id="stat-conflicts">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card wide">
+          <div>
+            <div class="stat-label">Total Steps Taken</div>
+            <div class="stat-value" id="stat-steps">0</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="section">
+      <div class="section-title">Legend</div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:hsl(180,90%,55%);"></div>
+          <span>Agent (colour = unique ID)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-ring" style="border-color:hsl(180,90%,55%);"></div>
+          <span>Goal marker (pulsing)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#22c55e;width:8px;height:8px;"></div>
+          <span>Green dot = Arrived</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f59e0b;width:8px;height:8px;"></div>
+          <span>Amber dot = Waiting</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#ef4444;width:8px;height:8px;"></div>
+          <span>Red dot = Stuck (no path)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-sq" style="background:#1a2340;border:1px solid rgba(100,140,200,0.3);"></div>
+          <span>Obstacle</span>
+        </div>
+      </div>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+  <!-- ================================================================
+       CANVAS
+       ================================================================ -->
+  <div id="canvas-wrapper">
+    <canvas id="sim-canvas"></canvas>
+
+    <!-- Planning overlay shown while PBS runs -->
+    <div id="planning-overlay" style="display:none;">
+      <div class="planning-spinner"></div>
+      <div class="planning-text">Computing Paths…</div>
+      <div class="planning-sub">Priority-Based Search · Space-Time A*</div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Scripts — order matters (dependencies first) -->
+<script src="js/grid.js"></script>
+<script src="js/astar.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/mapf.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

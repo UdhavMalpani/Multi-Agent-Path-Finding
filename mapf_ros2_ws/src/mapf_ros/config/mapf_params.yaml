@@ -1,0 +1,29 @@
+# mapf_params.yaml — Default MAPF simulation parameters
+# Override on command line: ros2 launch mapf_ros mapf_full.launch.py agent_count:=50
+
+mapf_planner:
+  ros__parameters:
+    agent_count:      100      # Number of agents
+    grid_size:         20      # Grid width = height (cells); 1 cell = 1 metre
+    obstacle_density:  0.12    # Fraction of cells as obstacles (0.0 – 0.35)
+    random_seed:       42      # RNG seed (change for different layouts)
+    max_time_horizon: 400      # Maximum ST-A* timestep horizon
+    frame_id:         "map"
+
+agent_controller:
+  ros__parameters:
+    agent_count:      100
+    # Controller gains (P-controller)
+    kp_linear:        0.8      # Forward gain (m/s per metre)
+    kp_angular:       2.5      # Angular gain (rad/s per radian)
+    max_linear_vel:   0.45     # m/s cap
+    max_angular_vel:  1.5      # rad/s cap
+    arrive_dist:      0.12     # Waypoint capture radius (metres)
+    heading_threshold: 0.15   # Align heading before driving (radians)
+
+world_spawner:
+  ros__parameters:
+    agent_count:      100
+    grid_size:         20
+    obstacle_density:  0.12
+    random_seed:       42

@@ -1,0 +1,39 @@
+# ==========================================
+# Multi-Agent Pathfinding (MAPF) .gitignore
+# ==========================================
+
+# ROS2 Colcon Build & Install Artifacts
+mapf_ros2_ws/build/
+mapf_ros2_ws/install/
+mapf_ros2_ws/log/
+**/COLCON_IGNORE
+**/.colcon_install_layout
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Editor & OS Artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs & Temporary Files
+*.log
+/tmp/

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # run.sh — Launch the full MAPF simulation (Gazebo + RViz2 + all nodes)
-set -euo pipefail
+set -eo pipefail
 CYAN='\033[0;36m'; GREEN='\033[0;32m'; NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+set +u
+export AMENT_TRACE_SETUP_FILES="${AMENT_TRACE_SETUP_FILES:-}"
 source /opt/ros/humble/setup.bash
 source "$SCRIPT_DIR/install/setup.bash"
 

@@ -2,7 +2,8 @@
 # ==============================================================================
 # Launch MAPF ROS2 + Gazebo Simulator
 # ==============================================================================
-set -euo pipefail
+set -eo pipefail
+set +u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROS_WS="$ROOT_DIR/mapf_ros2_ws"

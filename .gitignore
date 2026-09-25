@@ -37,3 +37,7 @@ Thumbs.db
 # Logs & Temporary Files
 *.log
 /tmp/
+
+# Other scratch workspaces
+energy-tamp/
+pddlstream_ws/
